@@ -3,12 +3,12 @@ import Header from './Header.jsx'
 import Box from './components/Box.jsx'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [mode, setMode] = useState("encode");
 
   return (
     <>
-      <Header/>
-      <Box/>
+      <Header setMode={setMode}/>
+      <Box mode={mode}/>
     </>
   )
 }

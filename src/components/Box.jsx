@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
-function Box() {
+function Box( {mode} ) {
     const morseCode = {
         // Letters
         A: '.-',    B: '-...',  C: '-.-.',  D: '-..',   E: '.',
@@ -24,19 +24,32 @@ function Box() {
         // Special
         ' ': '/' // word separator (common convention)
     };
+    const reverseMorseCode = Object.fromEntries(Object.entries(morseCode).map(([letter, code]) => [code, letter]));
 
     const [inputText, updateInputText] = useState("");
     const [outputText, updateOutputText] = useState("");
 
+    useEffect(() => {
+        updateInputText("");
+        updateOutputText("");
+    }, [mode]);
+
+    const buttonLabel = mode === "encode" ? "encode" : "decode";
+    const handleClick = mode === "encode" ? () => updateOutputText(encoder(inputText)) : () => updateOutputText(decoder(inputText));
+
     function encoder(sentence) {
         return sentence.toUpperCase().split('').map(char => morseCode[char] || '').join(' ');
+    }
+
+    function decoder(sentence){
+        return sentence.trim().split(' / ').map(word => word.split(' ').map(code => reverseMorseCode[code] || '').join('')).join(' ')
     }
 
     return (
         <>
             <div className="flex flex-row justify-evenly items-center py-8">
                 <div className="flex flex-col gap-2">
-                    <p>Enter sentence</p>
+                    <p>Language: {buttonLabel === "encode" ? "English" : "Morse Code"}</p>
                     <textarea
                         id="inputBox"
                         cols={50}
@@ -48,7 +61,7 @@ function Box() {
                     ></textarea>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <p>Display</p>
+                    <p>Language: {buttonLabel === "encode" ? "Morse Code" : "English"}</p>
                     <textarea
                         id="Box"
                         cols={50}
@@ -61,12 +74,13 @@ function Box() {
                 </div>
             </div>
             <div className="flex justify-center items-center pt-5 pb-20">
-                <button className="bg-[#d6ccc2] rounded-xl py-2 px-8 font-bold" onClick={() => updateOutputText(encoder(inputText))}>
-                    Click to decode
+                <button className="bg-[#d6ccc2] rounded-xl py-2 px-8 font-medium" onClick={handleClick}>
+                    Click to <span className="font-bold" onClick={handleClick}>{buttonLabel}</span>
                 </button>
             </div>
         </>
     );
-}
+
+    }
 
 export default Box
